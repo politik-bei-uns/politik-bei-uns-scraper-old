@@ -68,7 +68,7 @@ class Queue(object):
       'status': 'OPEN',
       'key': key,
       'failures': 0,
-      'lastModified': datetime.utcnow()
+      'modified': datetime.utcnow()
     }
     if payload is not None:
       job['payload'] = payload
@@ -90,7 +90,7 @@ class Queue(object):
     update = {
       '$set': {
         'status': 'IN_PROGRESS',
-        'lastModified': datetime.utcnow()
+        'modified': datetime.utcnow()
       }
     }
     find = self.db.queue.find_and_modify(query=query,
@@ -130,7 +130,7 @@ class Queue(object):
     update = {
       '$set': {
         'status': 'DONE',
-        'lastModified': datetime.utcnow()
+        'modified': datetime.utcnow()
       }
     }
     self.db.queue.find_and_modify(query=query,

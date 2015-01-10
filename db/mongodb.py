@@ -232,7 +232,7 @@ class MongoDatabase(object):
       logging.info("%s %s updated with _id %s", object_type, data_dict['originalId'], data_stored['_id'])
       set_attributes = {}
       for key in data_dict.keys():
-        if key in ['lastModified']:
+        if key in ['modified', 'created']:
           continue
         if key not in data_stored:
           logging.debug("Key '%s' will be added to %s", key, object_type)
@@ -245,7 +245,7 @@ class MongoDatabase(object):
             logging.debug("Key '%s' in %s has changed", key, object_type)
             set_attributes[key] = data_dict[key]
       if set_attributes != {}:
-        set_attributes['lastModified'] = data_dict['lastModified']
+        set_attributes['modified'] = data_dict['modified']
         datatable = getattr(self.db, object_type)
         datatable.update({'_id': data_stored['_id']}, {'$set': set_attributes})
       return data_stored['_id']
@@ -460,7 +460,7 @@ class MongoDatabase(object):
     file_changed = False
     if file_stored is not None:
       # file exists in database and must be compared field by field
-      logging.info("Document %s is already in db with _id=%s", file.originalId, str(file_stored['_id']))
+      logging.info("file %s is already in db with _id=%s", file.originalId, str(file_stored['_id']))
       # check if file is referenced
       file_data_stored = None
       if 'file' in file_stored:
@@ -497,7 +497,7 @@ class MongoDatabase(object):
       oid = file_stored['_id']
       set_attributes = {}
       for key in file_dict.keys():
-        if key in ['lastModified']:
+        if key in ['modified', 'created']:
           continue
         if key not in file_stored:
           set_attributes[key] = file_dict[key]
@@ -511,7 +511,7 @@ class MongoDatabase(object):
       if 'file' not in file_dict and 'file' in file_stored:
           set_attributes['file'] = file_stored['file']
       if file_changed or set_attributes != {}:
-        set_attributes['lastModified'] = file_dict['lastModified']
+        set_attributes['modified'] = file_dict['modified']
 
         self.db.file.update({'_id': oid}, {'$set': set_attributes})
     return oid

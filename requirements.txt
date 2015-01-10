@@ -4,7 +4,6 @@ parse
 pymongo
 pytest
 python-magic
-gunicorn
 pytz
 cssselect
 requests

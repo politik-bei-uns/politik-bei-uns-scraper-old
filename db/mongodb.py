@@ -282,9 +282,6 @@ class MongoDatabase(object):
     # dereference objects
     person_dict = self.dereference_object(person_dict, 'membership')
     
-    # create slug
-    # person_dict['slug'] = self.slugify(person_dict['identifier'])
-    
     # save data
     return self.save_object(person_dict, person_stored, 'person')
 
@@ -302,10 +299,6 @@ class MongoDatabase(object):
     
     # dereference objects
     membership_dict = self.dereference_object(membership_dict, 'organization')
-    #membership_dict = self.dereference_object(membership_dict, 'person') #TODO: Backref
-    
-    # create slug
-    # person_dict['slug'] = self.slugify(person_dict['identifier'])
     
     # save data
     return self.save_object(membership_dict, membership_stored, 'membership')
@@ -320,10 +313,6 @@ class MongoDatabase(object):
     # ensure that there is an originalId
     if 'originalId' not in organization_dict:
       logging.critical("Fatal error: no originalId avaiable at url %s", organization_dict.originalUrl)
-    
-    # dereference objects
-    #organization_dict = self.dereference_object(organization_dict, 'meeting') #TODO: Backref
-    #organization_dict = self.dereference_object(organization_dict, 'membership') #TODO: Backref
     
     # create slug
     organization_dict['slug'] = self.create_slug(organization_dict, 'committee')
@@ -353,10 +342,6 @@ class MongoDatabase(object):
     meeting_dict = self.dereference_object(meeting_dict, 'verbatimProtocol', 'file')
     meeting_dict = self.dereference_object(meeting_dict, 'auxiliaryFile', 'file')
     
-    
-    # create slug
-    # meeting_dict['slug'] = self.slugify(meeting_dict['identifier'])
-    
     # save data
     return self.save_object(meeting_dict, meeting_stored, 'meeting')
 
@@ -376,10 +361,6 @@ class MongoDatabase(object):
     
     # dereference items
     agendaitem_dict = self.dereference_object(agendaitem_dict, 'consultation')
-    # agendaitem_dict = self.dereference_object(agendaitem_dict, 'meeting') #TODO: Backref
-    
-    # create slug
-    # agendaitem_dict['slug'] = str(self.slugify(agendaitem_dict['identifier']))
 
     return self.save_object(agendaitem_dict, agendaitem_stored, 'agendaitem')
   
@@ -399,10 +380,6 @@ class MongoDatabase(object):
     
     # dereference items
     consultation_dict = self.dereference_object(consultation_dict, 'paper')
-    # consultation_dict = self.dereference_object(consultation_dict, 'agendaItem') #TODO: Backref
-    
-    # create slug
-    # agendaitem_dict['slug'] = str(self.slugify(agendaitem_dict['identifier']))
 
     return self.save_object(consultation_dict, consultation_stored, 'consultation')
 
@@ -424,10 +401,6 @@ class MongoDatabase(object):
     paper_dict = self.dereference_object(paper_dict, 'underDirectionOf', 'organization')
     paper_dict = self.dereference_object(paper_dict, 'superordinatedPaper', 'paper')
     paper_dict = self.dereference_object(paper_dict, 'subordinatedPaper', 'paper')
-    #paper_dict = self.dereference_object(paper_dict, 'consultation') #TODO: Backref
-    
-    # create slug
-    # paper_dict['slug'] = self.slugify(paper_dict['identifier'])
     
     return self.save_object(paper_dict, paper_stored, 'paper')
   
@@ -449,11 +422,6 @@ class MongoDatabase(object):
     if 'originalId' not in file_dict:
       logging.critical("Fatal error: no originalId avaiable at url %s", paper_dict.originalUrl)
 
-    # create slug
-    # file_dict['slug'] = self.create_slug(file_dict, 'document')
-    
-    # dereference items
-    # file_dict = self.dereference_object(file_dict, 'paper') #TODO: Backref
     file_dict = self.dereference_object(file_dict, 'masterFile', 'file')
     
     

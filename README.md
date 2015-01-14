@@ -19,8 +19,8 @@ Beschlussvorlagen, Anträgen und Anhängen auszulesen und diese in einer Datenba
 deutet auf die Funktionsweise hin: die Inhalte werden so aus den HTML-Seiten des RIS gelesen, wie sie für ganz
 normale Besucher im Web angezeigt werden.
 
-Scrape-A-RIS ist die Grundlage für die Web-Plattform Offenes Köln ([Github](https://github.com/marians/offeneskoeln), 
-[WWW](http://offeneskoeln.de/)), die zur benutzerfreundlichen Suche und Anzeige der Daten genutzt werden kann.
+Scrape-A-RIS ist die Grundlage für die Web-Plattform "Politik bei uns" ([Github](https://github.com/okfde/ris-web)), 
+[WWW](https://politik-bei-uns.de/), die zur benutzerfreundlichen Suche und Anzeige der Daten genutzt werden kann.
 Scrape-A-RIS kann jedoch auch unabhängig davon eingesetzt werden, bietet aber kein eigenes User Interface.
 
 
@@ -30,7 +30,7 @@ Scrape-A-RIS ist in Python geschrieben und wurde erfolgreich mit Python-Version 
 und 2.6.6 auf Debian und Red Hat Linux getestet.
 
 Daten werden in einer [MongoDB](http://www.mongodb.org/) Datenbank gespeichert. Empfohlen ist die aktuellste
-Version 2.4 (speziell für die Verwendung mit [Offenes Köln](https://github.com/marians/offeneskoeln)).
+Version 2.4 (speziell für die Verwendung mit [Politik bei uns](https://github.com/okfde/ris-web)).
 
 Weitere benötigte Software wird in der
 [Installationsanleitung](https://github.com/marians/scrape-a-ris/wiki/Installation) genannt.
@@ -61,7 +61,7 @@ Viel mehr zur Benutzung gibt es in einem [ausführlichen Tutorial](https://githu
 
 ## Feedback
 
-Bitte nutze den [Issues](https://github.com/marians/scrape-a-ris/issues) Bereich in diesem Github repository, um
+Bitte nutze den [Issues](https://github.com/okfde/ris-scraper/issues) Bereich in diesem Github repository, um
 Bugs zu melden.
 
 Wenn Du Hilfe bei der Anpassung der Konfiguration an Dein RIS benötigst, kannst Du Dich auch an die [RIS-Öffner

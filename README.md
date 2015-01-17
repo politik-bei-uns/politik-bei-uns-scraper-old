@@ -54,7 +54,7 @@ Viel mehr zur Benutzung gibt es in einem [ausführlichen Tutorial](https://githu
 
 ###Lizenz
 
-Der Code steht unter einer MIT-artigen [Lizenz](https://github.com/okfde/ris-web/blob/master/LIZENZ.txt).
+Der Code steht unter einer MIT-artigen [Lizenz](https://github.com/okfde/ris-scraper/blob/master/LIZENZ.txt).
 
 ## Feedback
 

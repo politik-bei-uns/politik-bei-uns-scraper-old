@@ -52,6 +52,10 @@ Mit diesem Aufruf können Inhalte für Februar und März 2013 abgerufen werden:
 
 Viel mehr zur Benutzung gibt es in einem [ausführlichen Tutorial](https://github.com/okfde/ris-scraper/wiki/Benutzung).
 
+###Lizenz
+
+Der Code steht unter einer MIT-artigen [Lizenz](https://github.com/okfde/ris-web/blob/master/LIZENZ.txt).
+
 ## Feedback
 
 Bitte nutze den [Issues](https://github.com/okfde/ris-scraper/issues) Bereich in diesem Github repository, um

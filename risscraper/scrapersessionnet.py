@@ -1,26 +1,18 @@
 # encoding: utf-8
 
 """
-Copyright (c) 2012 Marian Steinbach, Ernesto Ruge
+Copyright (c) 2012 - 2015, Marian Steinbach, Ernesto Ruge
+All rights reserved.
 
-Hiermit wird unentgeltlich jeder Person, die eine Kopie der Software und
-der zugehörigen Dokumentationen (die "Software") erhält, die Erlaubnis
-erteilt, sie uneingeschränkt zu benutzen, inklusive und ohne Ausnahme, dem
-Recht, sie zu verwenden, kopieren, ändern, fusionieren, verlegen
-verbreiten, unterlizenzieren und/oder zu verkaufen, und Personen, die diese
-Software erhalten, diese Rechte zu geben, unter den folgenden Bedingungen:
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-Der obige Urheberrechtsvermerk und dieser Erlaubnisvermerk sind in allen
-Kopien oder Teilkopien der Software beizulegen.
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 
-Die Software wird ohne jede ausdrückliche oder implizierte Garantie
-bereitgestellt, einschließlich der Garantie zur Benutzung für den
-vorgesehenen oder einen bestimmten Zweck sowie jeglicher Rechtsverletzung,
-jedoch nicht darauf beschränkt. In keinem Fall sind die Autoren oder
-Copyrightinhaber für jeglichen Schaden oder sonstige Ansprüche haftbar zu
-machen, ob infolge der Erfüllung eines Vertrages, eines Delikts oder anders
-im Zusammenhang mit der Software oder sonstiger Verwendung der Software
-entstanden.
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import mechanize
@@ -912,7 +904,7 @@ class ScraperSessionNet(object):
         if ord(file.content[0]) == 32 and ord(file.content[1]) == 10:
           file.content = file.content[2:]
         file.mimetype = magic.from_buffer(file.content, mime=True)
-        file.filename = self.make_filename(file.originalId, file.mimetype)
+        file.filename = self.make_filename(file)
       except mechanize.HTTPError as e:
         if e.code == 502 or e.code == 500:
           retry_counter = retry_counter + 1
@@ -924,41 +916,23 @@ class ScraperSessionNet(object):
           return
     return file
   
-  def make_file_path(self, originalId):
-    """
-    Creates a reconstructable foder hierarchy for files
-    """
-    sha1 = hashlib.sha1(originalId).hexdigest()
-    firstfolder = sha1[0:1]   # erstes Zeichen von der Checksumme
-    secondfolder = sha1[1:2]  # zweites Zeichen von der Checksumme
-    ret = os.path.join(self.config['attachment_folder'], str(self.config['city']['_id']), str(firstfolder), str(secondfolder))
-    return ret
-  
-  def make_filename(self, originalId, mimetype):
+  def make_filename(self, file):
     ext = 'dat'
     
+    try:
+      name = file.name
+    except AttributeError:
+      name = file.originalId
+    
     for extension in self.config['file_extensions']:
-      if extension[0] == mimetype:
+      if extension[0] == file.mimetype:
         ext = extension[1]
         break
     if ext == 'dat':
-      logging.warn("No entry in config:main:file_extensions for %s at file id %s", mimetype, originalId)
+      logging.warn("No entry in config:main:file_extensions for %s at file id %s", file.mimetype, file.originalId)
     # Verhindere Dateinamen > 255 Zeichen
-    originalId = originalId[:192]
-    return originalId + '.' + ext
-
-  def save_file(self, content, originalId, mimetype):
-    """
-    Creates a reconstructable folder hierarchy for files
-    """
-    folder = self.make_file_path(originalId)
-    if not os.path.exists(folder):
-      os.makedirs(folder)
-    path = folder + os.sep + self.make_filename(self, originalId, mimetype)
-    with open(path, 'wb') as f:
-      f.write(content)
-      f.close()
-      return path
+    name = name[:192]
+    return name + '.' + ext
 
   def list_in_string(self, stringlist, string):
     """
@@ -968,7 +942,6 @@ class ScraperSessionNet(object):
       if lstring in string:
         return True
     return False
-
 
   def get_url(self, url):
     retry_counter = 0

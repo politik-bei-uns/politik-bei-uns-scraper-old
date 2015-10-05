@@ -1,26 +1,18 @@
 # encoding: utf-8
 
 """
-Copyright (c) 2012 Marian Steinbach, Ernesto Ruge
+Copyright (c) 2012 - 2015, Marian Steinbach, Ernesto Ruge
+All rights reserved.
 
-Hiermit wird unentgeltlich jeder Person, die eine Kopie der Software und
-der zugehörigen Dokumentationen (die "Software") erhält, die Erlaubnis
-erteilt, sie uneingeschränkt zu benutzen, inklusive und ohne Ausnahme, dem
-Recht, sie zu verwenden, kopieren, ändern, fusionieren, verlegen
-verbreiten, unterlizenzieren und/oder zu verkaufen, und Personen, die diese
-Software erhalten, diese Rechte zu geben, unter den folgenden Bedingungen:
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-Der obige Urheberrechtsvermerk und dieser Erlaubnisvermerk sind in allen
-Kopien oder Teilkopien der Software beizulegen.
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 
-Die Software wird ohne jede ausdrückliche oder implizierte Garantie
-bereitgestellt, einschließlich der Garantie zur Benutzung für den
-vorgesehenen oder einen bestimmten Zweck sowie jeglicher Rechtsverletzung,
-jedoch nicht darauf beschränkt. In keinem Fall sind die Autoren oder
-Copyrightinhaber für jeglichen Schaden oder sonstige Ansprüche haftbar zu
-machen, ob infolge der Erfüllung eines Vertrages, eines Delikts oder anders
-im Zusammenhang mit der Software oder sonstiger Verwendung der Software
-entstanden.
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from pymongo import MongoClient
@@ -374,12 +366,13 @@ class MongoDatabase(object):
     # setting body
     consultation_dict['body'] = DBRef(collection='body',id=self.body_uid)
     
-    
     if 'originalId' not in consultation_dict:
       logging.critical("Fatal error: no originalId avaiable at url %s", consultation_dict.originalUrl)
     
     # dereference items
+    consultation_dict = self.dereference_object(consultation_dict, 'agendaItem', 'agendaItem')
     consultation_dict = self.dereference_object(consultation_dict, 'paper')
+    consultation_dict = self.dereference_object(consultation_dict, 'meeting', 'meeting')
 
     return self.save_object(consultation_dict, consultation_stored, 'consultation')
 
@@ -401,6 +394,7 @@ class MongoDatabase(object):
     paper_dict = self.dereference_object(paper_dict, 'underDirectionOf', 'organization')
     paper_dict = self.dereference_object(paper_dict, 'superordinatedPaper', 'paper')
     paper_dict = self.dereference_object(paper_dict, 'subordinatedPaper', 'paper')
+    paper_dict = self.dereference_object(paper_dict, 'consultation', 'consultation')
     
     return self.save_object(paper_dict, paper_stored, 'paper')
   
@@ -424,7 +418,6 @@ class MongoDatabase(object):
 
     file_dict = self.dereference_object(file_dict, 'masterFile', 'file')
     
-    
     file_changed = False
     if file_stored is not None:
       # file exists in database and must be compared field by field
@@ -437,12 +430,15 @@ class MongoDatabase(object):
         file_data_stored = self.db.fs.files.find_one({'_id': file_stored['file'].id})
       if file_data_stored is not None and file.content:
         # compare stored and submitted file
+        print file_data_stored['length']
+        print len(file.content)
         if file_data_stored['length'] != len(file.content):
           file_changed = True
         elif file_data_stored['md5'] != md5(file.content).hexdigest():
           file_changed = True
       if file_data_stored is None and file.content:
         file_changed = True
+    
     # Create new file version (if necessary)
     if ((file_changed and 'depublication' not in file_stored) or (file_stored is None)) and file.content:
       file_oid = self.fs.put(file.content,
@@ -480,7 +476,6 @@ class MongoDatabase(object):
           set_attributes['file'] = file_stored['file']
       if file_changed or set_attributes != {}:
         set_attributes['modified'] = file_dict['modified']
-
         self.db.file.update({'_id': oid}, {'$set': set_attributes})
     return oid
 

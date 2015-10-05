@@ -1,26 +1,18 @@
 # encoding: utf-8
 
 """
-Copyright (c) 2012 Marian Steinbach
+Copyright (c) 2012 - 2015, Marian Steinbach, Ernesto Ruge
+All rights reserved.
 
-Hiermit wird unentgeltlich jeder Person, die eine Kopie der Software und
-der zugehörigen Dokumentationen (die "Software") erhält, die Erlaubnis
-erteilt, sie uneingeschränkt zu benutzen, inklusive und ohne Ausnahme, dem
-Recht, sie zu verwenden, kopieren, ändern, fusionieren, verlegen
-verbreiten, unterlizenzieren und/oder zu verkaufen, und Personen, die diese
-Software erhalten, diese Rechte zu geben, unter den folgenden Bedingungen:
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-Der obige Urheberrechtsvermerk und dieser Erlaubnisvermerk sind in allen
-Kopien oder Teilkopien der Software beizulegen.
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 
-Die Software wird ohne jede ausdrückliche oder implizierte Garantie
-bereitgestellt, einschließlich der Garantie zur Benutzung für den
-vorgesehenen oder einen bestimmten Zweck sowie jeglicher Rechtsverletzung,
-jedoch nicht darauf beschränkt. In keinem Fall sind die Autoren oder
-Copyrightinhaber für jeglichen Schaden oder sonstige Ansprüche haftbar zu
-machen, ob infolge der Erfüllung eines Vertrages, eines Delikts oder anders
-im Zusammenhang mit der Software oder sonstiger Verwendung der Software
-entstanden.
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from base import Base
@@ -32,7 +24,7 @@ class Meeting(Base):
   A meeting class
   """
   def __init__(self, originalId=None, body=None, originalUrl=None, created=None, modified=None, keyword=None,
-               name=None, shortName=None, start=None, end=None, streetAdress=None, postalCode=None, locality=None,
+               name=None, shortName=None, start=None, end=None, room=None, streetAdress=None, postalCode=None, locality=None, type=None, location=None,
                organization=None, chairPerson=None, scribe=None, participant=None, invited=None, attendant=None,
                invitation=None, resultsProtocol=None, verbatimProtocol=None, auxiliaryFile=None, agendaItem=None, nameShort=None):
     self.originalId = originalId
@@ -43,20 +35,22 @@ class Meeting(Base):
     self.keyword = keyword
     
     self.name = name
-    self.shortName = shortName
     self.x_start = start
     self.x_end = end
+    self.room = room
     self.streetAddress = streetAdress
     self.postalCode = postalCode
     self.locality = locality
-    self.organization = organization #list
+    self.type = type # non-oparl
+    self.location = location # ref
+    self.organization = organization # list of organization
     self.chairPerson = chairPerson
+    self.participant = participant # ref list depreciated(?)
+    self.invitation = invitation #list of file
     self.scribe = scribe
-    self.participant = participant #list depreciated
     self.invited = invited #list
     self.attendant = attendant #list
     
-    self.invitation = invitation #list of file
     self.resultsProtocol = resultsProtocol #file
     self.verbatimProtocol = verbatimProtocol #file
     self.auxiliaryFile = auxiliaryFile #list of file

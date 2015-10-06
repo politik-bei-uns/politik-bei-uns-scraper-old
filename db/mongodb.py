@@ -430,8 +430,6 @@ class MongoDatabase(object):
         file_data_stored = self.db.fs.files.find_one({'_id': file_stored['file'].id})
       if file_data_stored is not None and file.content:
         # compare stored and submitted file
-        print file_data_stored['length']
-        print len(file.content)
         if file_data_stored['length'] != len(file.content):
           file_changed = True
         elif file_data_stored['md5'] != md5(file.content).hexdigest():

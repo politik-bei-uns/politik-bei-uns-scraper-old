@@ -271,9 +271,6 @@ class ScraperAllRis(object):
       for line in table.findall("tr"):
         if line[0].tag == "th":
           what = line[0].text.strip()
-          print "YYYYYYYYYYYY"
-          print what
-          print 'Wahlperiode' in what
           field = None
           field_list = None
           if what in type_map:
@@ -305,7 +302,6 @@ class ScraperAllRis(object):
           # now the first col might be a form with more useful information which will carry through until we find another one
           # with it. we still check the name though
           form = line[0].find("form")
-          print form
           if form is not None:
             if field:
               group_id = int(form.find("input[@name='%s']" % field).get("value"))
@@ -613,9 +609,10 @@ class ScraperAllRis(object):
         paper.originalUrl = paper_url
         paper.name = data['betreff']
         paper.description = data['docs']
-        paper.type = data['drucksache-art']
+        if 'drucksache-art' in data:
+          paper.paperType = data['drucksache-art']
         if first_date:
-          paper.publishedDate = first_date.strftime("%Y-%m-%d")
+          paper.publishedDate = first_date.strftime("%d.%m.%Y")
         # see theory above
         #if 'consultations' in data:
         #  paper.consultation = data['consultations']
@@ -676,7 +673,6 @@ class ScraperAllRis(object):
     logging.info("Getting file %s from %s", file.originalId, file_url)
     
     if post:
-      print file_url
       file_file = self.get_url(file_url, post_data={'DOLFDNR': file.originalId, 'options': '64'})
     else:
       file_file = self.get_url(file_url)

@@ -261,7 +261,9 @@ class ScraperAllRis(object):
           'Fraktionen': {'mtype' : 'parliament', 'field' : 'FRLFDNR'},
           u'Ausschüsse' : {'mtype' : 'organization', 'field' : 'AULFDNR'},
           'Stadtbezirk': {'mtype' : 'parliament', 'field' : 'PALFDNR'},
-          'BVV': {'mtype' : 'parliament', 'field' : 'PALFDNR'}
+          'BVV': {'mtype' : 'parliament', 'field' : 'PALFDNR'},
+          'Bezirksparlament': {'mtype' : 'parliament', 'field' : 'PALFDNR'},
+          'Bezirksverordnetenversammlung': {'mtype' : 'parliament', 'field' : 'PALFDNR'}
         }
     
         # obtain the table with the membership list via a simple state machine
@@ -454,7 +456,8 @@ class ScraperAllRis(object):
             except:
               logging.warn("Unable to parse resolution text at %s", agendaitem_url)
           else:
-            add_agenda_item[add_item.tag] = h.unescape(add_item.text)
+            if add_item.text:
+              add_agenda_item[add_item.tag] = h.unescape(add_item.text)
         agendaitem.name = add_agenda_item['toptext']
         
         consultation = Consultation(originalId=unicode(agendaitem.originalId) + unicode(int(elem['volfdnr'])))

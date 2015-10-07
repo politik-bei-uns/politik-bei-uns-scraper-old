@@ -240,110 +240,127 @@ class ScraperAllRis(object):
   
   def get_person_organization(self, person_id=None, organization_url=None):
     url = "%skp020.asp?KPLFDNR=%s&history=true" % (self.config['scraper']['base_url'], person_id)
+    
     logging.info("Getting person organization from %s", url)
-    response = self.get_url(url)
-    if not url:
-      return
-    tree = html.fromstring(response.text)
-      
-    memberships = []
-    person = Person(originalId=person_id)
-    # maps name of type to form name and membership type
-    type_map = {
-      u'Rat der Stadt' : {'mtype' : 'parliament', 'field' : 'PALFDNR'},
-      u'Parlament' : {'mtype' : 'parliament', 'field' : 'PALFDNR'},
-      u'Fraktion' : {'mtype' : 'organisation', 'field' : 'FRLFDNR'},
-      'Fraktionen': {'mtype' : 'parliament', 'field' : 'FRLFDNR'},
-      u'Ausschüsse' : {'mtype' : 'organization', 'field' : 'AULFDNR'},
-      'Stadtbezirk': {'mtype' : 'parliament', 'field' : 'PALFDNR'},
-      'BVV': {'mtype' : 'parliament', 'field' : 'PALFDNR'}
-    }
-
-    # obtain the table with the membership list via a simple state machine
-    mtype = "parliament"
-    field = 'PALFDNR'
-    old_group_id = None         # for checking if it changes
-    old_group_name = None       # for checking if it changes
-    group_id = None             # might break otherwise
-    table = tree.xpath('//*[@id="rismain_raw"]/table[2]')
-    if len(table):
-      table = table[0]
-      for line in table.findall("tr"):
-        if line[0].tag == "th":
-          what = line[0].text.strip()
-          field = None
-          field_list = None
-          if what in type_map:
-            mtype = type_map[what]['mtype']
-            field = type_map[what]['field']
-          elif 'Wahlperiode' in what:
-            mtype = 'parliament'
-            field_list = ['KPLFDNR', 'AULFDNR'] # 'FRLFDNR'
-          elif "Auskünfte gemäß BVV" in what:
-            break
-          else:
-            logging.error("Unknown organization type %s at person detail page %s", what, person_id)
-            continue
-        else:
-          if "Keine Information" in line.text_content():
-            # skip because no content is available
-            continue
+    # stupid re-try concept because AllRis sometimes misses start < at tags at first request
+    try_counter = 0
+    while True:
+      try:
+        response = self.get_url(url)
+        if not url:
+          return
+        tree = html.fromstring(response.text)
           
-          # Empty line = strange stuff comes after this
-          if len(list(line)) < 2:
-            break
-          
-          # first get the name of group
-          group_name = line[1].text_content()
-          organization = Organization(name=group_name)
-          
-          organization.classification = mtype
-  
-          # now the first col might be a form with more useful information which will carry through until we find another one
-          # with it. we still check the name though
-          form = line[0].find("form")
-          if form is not None:
-            if field:
-              group_id = int(form.find("input[@name='%s']" % field).get("value"))
-            elif field_list:
-              for field in field_list:
-                temp_form = form.find("input[@name='%s']" % field)
-                if temp_form is not None:
-                  group_id = int(temp_form.get("value"))
-            organization.originalId = group_id
-            old_group_id = group_id # remember it for next loop
-            old_group_name = group_name # remember it for next loop
-          else:
-            # we did not find a form. We assume that the old group still applies but we nevertheless check if the groupname is still the same
-            if old_group_name != group_name:
-              logging.warn("Group name differs but we didn't get a form with new group id: group name=%s, old group name=%s, old group id=%s at url %s", group_name, old_group_name, old_group_id, url)
-              organization.originalId = None
+        memberships = []
+        person = Person(originalId=person_id)
+        # maps name of type to form name and membership type
+        type_map = {
+          u'Rat der Stadt' : {'mtype' : 'parliament', 'field' : 'PALFDNR'},
+          u'Parlament' : {'mtype' : 'parliament', 'field' : 'PALFDNR'},
+          u'Fraktion' : {'mtype' : 'organisation', 'field' : 'FRLFDNR'},
+          'Fraktionen': {'mtype' : 'parliament', 'field' : 'FRLFDNR'},
+          u'Ausschüsse' : {'mtype' : 'organization', 'field' : 'AULFDNR'},
+          'Stadtbezirk': {'mtype' : 'parliament', 'field' : 'PALFDNR'},
+          'BVV': {'mtype' : 'parliament', 'field' : 'PALFDNR'}
+        }
+    
+        # obtain the table with the membership list via a simple state machine
+        mtype = "parliament"
+        field = 'PALFDNR'
+        old_group_id = None         # for checking if it changes
+        old_group_name = None       # for checking if it changes
+        group_id = None             # might break otherwise
+        table = tree.xpath('//*[@id="rismain_raw"]/table[2]')
+        if len(table):
+          table = table[0]
+          for line in table.findall("tr"):
+            if line[0].tag == "th":
+              what = line[0].text.strip()
+              field = None
+              field_list = None
+              if what in type_map:
+                mtype = type_map[what]['mtype']
+                field = type_map[what]['field']
+              elif 'Wahlperiode' in what:
+                mtype = 'parliament'
+                field_list = ['KPLFDNR', 'AULFDNR'] # 'FRLFDNR'
+              elif "Auskünfte gemäß BVV" in what:
+                break
+              else:
+                logging.error("Unknown organization type %s at person detail page %s", what, person_id)
+                continue
             else:
-              organization.originalId = old_group_id
-          membership = Membership(organization=organization)
-          membership.originalId = unicode(person_id) + '-' + unicode(group_id)
-          
-          # TODO: create a list of functions so we can index them somehow
-          function = line[2].text_content()
-          raw_date = line[3].text_content()
-          # parse the date information
-          if "seit" in raw_date:
-            dparts = raw_date.split()
-            membership.endDate = dparts[-1]
-          elif "Keine" in raw_date or raw_date.strip() == '':
-            # no date information available
-            start_date = end_date = None
-          else:
-            dparts = raw_date.split()
-            membership.startDate = dparts[0]
-            membership.endDate = dparts[-1]
-          if organization.originalId is not None:
-            memberships.append(membership)
-          else:
-            logging.warn("Bad organization at %s" % (url))
-          
-      person.membership = memberships
-      oid = self.db.save_person(person)
+              if "Keine Information" in line.text_content():
+                # skip because no content is available
+                continue
+              
+              # Empty line = strange stuff comes after this
+              if len(list(line)) < 2:
+                break
+              
+              # first get the name of group
+              group_name = line[1].text_content()
+              organization = Organization(name=group_name)
+              
+              organization.classification = mtype
+      
+              # now the first col might be a form with more useful information which will carry through until we find another one
+              # with it. we still check the name though
+              form = line[0].find("form")
+              if form is not None:
+                if field:
+                  group_id = int(form.find("input[@name='%s']" % field).get("value"))
+                elif field_list:
+                  for field in field_list:
+                    temp_form = form.find("input[@name='%s']" % field)
+                    if temp_form is not None:
+                      group_id = int(temp_form.get("value"))
+                organization.originalId = group_id
+                old_group_id = group_id # remember it for next loop
+                old_group_name = group_name # remember it for next loop
+              else:
+                # we did not find a form. We assume that the old group still applies but we nevertheless check if the groupname is still the same
+                if old_group_name != group_name:
+                  logging.warn("Group name differs but we didn't get a form with new group id: group name=%s, old group name=%s, old group id=%s at url %s", group_name, old_group_name, old_group_id, url)
+                  organization.originalId = None
+                else:
+                  organization.originalId = old_group_id
+              membership = Membership(organization=organization)
+              membership.originalId = unicode(person_id) + '-' + unicode(group_id)
+              
+              # TODO: create a list of functions so we can index them somehow
+              function = line[2].text_content()
+              raw_date = line[3].text_content()
+              # parse the date information
+              if "seit" in raw_date:
+                dparts = raw_date.split()
+                membership.endDate = dparts[-1]
+              elif "Keine" in raw_date or raw_date.strip() == '':
+                # no date information available
+                start_date = end_date = None
+              else:
+                dparts = raw_date.split()
+                membership.startDate = dparts[0]
+                membership.endDate = dparts[-1]
+              if organization.originalId is not None:
+                memberships.append(membership)
+              else:
+                logging.warn("Bad organization at %s" % (url))
+              
+          person.membership = memberships
+          oid = self.db.save_person(person)
+          return
+        else:
+          logging.info("table missing, nothing to do at %s" % url)
+          return
+      except (AttributeError):
+        if try_counter < 3:
+          logging.info("Try again: Getting person organizations with person id %d from %s", person_id, url)
+          try_counter += 1
+        else:
+          logging.error("Failed getting person organizations with person id %d from %s", person_id, url)
+          return
+    
   
   def get_person_organization_presence(self, person_id=None, person_url=None):
     # URL is like si019.asp?SILFDNR=5672

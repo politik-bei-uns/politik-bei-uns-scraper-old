@@ -51,60 +51,33 @@ class MongoDatabase(object):
     """
     # body
     self.config = config
-    self.db.body.ensure_index([('rgs', ASCENDING)], unique=True)
     self.body_uid = config['city']['_id']
     
     """
-    self.db.committee.ensure_index([('identifier', ASCENDING), ('body', ASCENDING)], unique=True)
-    self.db.person.ensure_index([('identifier', ASCENDING), ('body', ASCENDING)], unique=True)
-    self.db.organisation.ensure_index([('identifier', ASCENDING), ('body', ASCENDING)], unique=True)
+    self.db.committee.ensure_index([('originalId', ASCENDING), ('body', ASCENDING)], unique=True)
     
-    # meeting = session
-    self.db.meeting.ensure_index([('identifier', ASCENDING), ('body', ASCENDING)], unique=True)
-    self.db.meeting.ensure_index([('numeric_id', ASCENDING), ('body', ASCENDING)], unique=True)
-    self.db.meeting.ensure_index([('slug', ASCENDING), ('body', ASCENDING)], unique=True)
+    # meeting
+    self.db.meeting.ensure_index([('originalId', ASCENDING), ('body', ASCENDING)], unique=True)
     
     # agendaitem
-    self.db.agendaitem.ensure_index([('identifier', ASCENDING), ('body', ASCENDING)], unique=True)
-    self.db.agendaitem.ensure_index([('numeric_id', ASCENDING), ('body', ASCENDING)], unique=True)
-    self.db.agendaitem.ensure_index([('slug', ASCENDING), ('body', ASCENDING)], unique=True)
+    self.db.agendaitem.ensure_index([('originalId', ASCENDING), ('body', ASCENDING)], unique=True)
     
-    # paper = submission
-    self.db.paper.ensure_index([('identifier', ASCENDING), ('body', ASCENDING)], unique=True)
-    self.db.paper.ensure_index([('numeric_id', ASCENDING), ('body', ASCENDING)], unique=True)
-    self.db.paper.ensure_index([('slug', ASCENDING), ('body', ASCENDING)], unique=True)
+    # paper
+    self.db.paper.ensure_index([('originalId', ASCENDING), ('body', ASCENDING)], unique=True)
     
     # document = attachment
     self.db.document.ensure_index([('identifier', ASCENDING), ('body', ASCENDING)], unique=True)
-    self.db.document.ensure_index([('slug', ASCENDING), ('body', ASCENDING)], unique=True)
     
-    # committee
-    self.db.committee.ensure_index([('identifier', ASCENDING), ('body', ASCENDING)], unique=True)
-    # we don't have ids there, so its not unique
-    self.db.committee.ensure_index([('numeric_id', ASCENDING), ('body', ASCENDING)], unique=False)
-    self.db.committee.ensure_index([('slug', ASCENDING), ('body', ASCENDING)], unique=True)
+    # organization
+    self.db.organization.ensure_index([('identifier', ASCENDING), ('body', ASCENDING)], unique=True)
     
     # person
-    self.db.person.ensure_index([('identifier', ASCENDING), ('body', ASCENDING)], unique=True)
-    self.db.person.ensure_index([('numeric_id', ASCENDING), ('body', ASCENDING)], unique=True)
-    self.db.person.ensure_index([('slug', ASCENDING), ('body', ASCENDING)], unique=True)
+    self.db.person.ensure_index([('originalId', ASCENDING), ('body', ASCENDING)], unique=True)
     
     # location 
-    #self.db.document.ensure_index([('identifier', ASCENDING), ('rs', ASCENDING)], unique=True)
+    #self.db.document.ensure_index([('originalId', ASCENDING), ('rs', ASCENDING)], unique=True)
     
-    #self.db.sessions.ensure_index([('numeric_id', ASCENDING), ('rs', ASCENDING)], unique=True)
-    #self.db.sessions.ensure_index([('url', ASCENDING), ('rs', ASCENDING)], unique=True)
-    #self.db.submissions.ensure_index([('numeric_id', ASCENDING), ('rs', ASCENDING)], unique=True)
-    #self.db.submissions.ensure_index([('url', ASCENDING), ('rs', ASCENDING)], unique=True)
-    #self.db.submissions.ensure_index([('identifier', ASCENDING), ('rs', ASCENDING)], unique=True)
-    #self.db.attachments.ensure_index([('identifier', ASCENDING), ('rs', ASCENDING)], unique=True)
-    self.db.fs.files.ensure_index(
-      [
-        ('body', ASCENDING),
-        ('filename', ASCENDING),
-        ('uploadDate', DESCENDING),
-      ],
-      unique=True)
+    #self.db.attachments.ensure_index([('originalId', ASCENDING), ('rs', ASCENDING)], unique=True)
     """
   def erase(self):
     """

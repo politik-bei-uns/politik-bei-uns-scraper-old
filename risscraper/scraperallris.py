@@ -461,22 +461,19 @@ class ScraperAllRis(object):
               add_agenda_item[add_item.tag] = h.unescape(add_item.text)
         agendaitem.name = add_agenda_item['toptext']
         
-        consultation = Consultation(originalId=unicode(agendaitem.originalId) + unicode(int(elem['volfdnr'])))
-        if 'voname' in add_agenda_item:
-          consultation.paper = Paper(originalId = int(elem['volfdnr']), name=add_agenda_item['voname'])
-        else:
-          consultation.paper = Paper(originalId = int(elem['volfdnr']))
-        agendaitem.consultation = [consultation]
-        if 'vobetr' in add_agenda_item:
-          if add_agenda_item['vobetr'] != agendaitem.name:
-            logging.warn("different values for name: %s and %s", agendaitem.name, add_agenda_item['vobetr'])
-        if hasattr(self, 'paper_queue'):
-          self.paper_queue.add(int(elem['volfdnr']))
-        # nonsense?
-        #if "nowDate" not in add_agenda_item:
-        #  # something is broken with this so we don't store it
-        #  logging.warn("Skipping broken agenda at ", agendaitem_url)
-        #else:
+        # there are papers with id = 0. we don't need them.
+        if int(elem['volfdnr']):
+          consultation = Consultation(originalId=unicode(agendaitem.originalId) + unicode(int(elem['volfdnr'])))
+          if 'voname' in add_agenda_item:
+            consultation.paper = Paper(originalId = int(elem['volfdnr']), name=add_agenda_item['voname'])
+          else:
+            consultation.paper = Paper(originalId = int(elem['volfdnr']))
+          agendaitem.consultation = [consultation]
+          if 'vobetr' in add_agenda_item:
+            if add_agenda_item['vobetr'] != agendaitem.name:
+              logging.warn("different values for name: %s and %s", agendaitem.name, add_agenda_item['vobetr'])
+          if hasattr(self, 'paper_queue'):
+            self.paper_queue.add(int(elem['volfdnr']))
         if 'totyp' in add_agenda_item:
           agendaitem.result = add_agenda_item['totyp']
         agendaitems.append(agendaitem)

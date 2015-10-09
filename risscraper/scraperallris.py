@@ -122,7 +122,7 @@ class ScraperAllRis(object):
 
   def find_person(self):
     find_person_url = self.config['scraper']['base_url'] + 'kp041.asp?template=xyz&selfaction=ws&showAll=true&PALFDNRM=1&kpdatfil=&filtdatum=filter&kpname=&kpsonst=&kpampa=99999999&kpfr=99999999&kpamfr=99999999&kpau=99999999&kpamau=99999999&searchForm=true&search=Suchen'
-    print "Getting person overview from %s" % (find_person_url)
+    logging.info("Getting person overview from %s" % (find_person_url))
     
     """parse an XML file and return the tree"""
     parser = etree.XMLParser(recover=True)
@@ -209,7 +209,8 @@ class ScraperAllRis(object):
     if not r:
       return
     
-    xml = r.text.encode('ascii','xmlcharrefreplace') 
+    xml = r.text.encode('ascii','xmlcharrefreplace').replace('</a>', '')
+    xml = re.sub(r'<a href="([^"]*)" target="_blank" ?>', r'\1', xml)
     root = etree.fromstring(xml, parser=parser)
     for item in root:
       if item.tag == 'list':
@@ -471,10 +472,12 @@ class ScraperAllRis(object):
             logging.warn("different values for name: %s and %s", agendaitem.name, add_agenda_item['vobetr'])
         if hasattr(self, 'paper_queue'):
           self.paper_queue.add(int(elem['volfdnr']))
-        if "nowDate" not in add_agenda_item:
-          # something is broken with this so we don't store it
-          logging.warn("Skipping broken agenda at ", agendaitem_url)
-        else:
+        # nonsense?
+        #if "nowDate" not in add_agenda_item:
+        #  # something is broken with this so we don't store it
+        #  logging.warn("Skipping broken agenda at ", agendaitem_url)
+        #else:
+        if 'totyp' in add_agenda_item:
           agendaitem.result = add_agenda_item['totyp']
         agendaitems.append(agendaitem)
     meeting.agendaItem = agendaitems

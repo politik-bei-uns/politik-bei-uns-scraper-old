@@ -131,13 +131,14 @@ class ScraperAllRis(object):
       return
     xml = r.text.encode('ascii','xmlcharrefreplace') 
     tree = etree.fromstring(xml, parser=parser)
+    h = HTMLParser.HTMLParser()
   
     # element 0 is the special block
     # element 1 is the list of persons
     for node in tree[1].iterchildren():
       elem = {}
       for e in node.iterchildren():
-        elem[e.tag] = e.text
+        elem[e.tag] = h.unescape(e.text)
       
       # now retrieve person details such as organization memberships etc.
       # we also get the age (but only that, no date of birth)
@@ -204,6 +205,7 @@ class ScraperAllRis(object):
     logging.info("Getting meeting overview from %s", meeting_find_url)
     
     parser = etree.XMLParser(recover=True)
+    h = HTMLParser.HTMLParser()
     
     r = self.get_url(meeting_find_url)
     if not r:
@@ -219,7 +221,7 @@ class ScraperAllRis(object):
     for item in root.iterchildren():
       raw_meeting = {}
       for e in item.iterchildren():
-        raw_meeting[e.tag] = e.text
+        raw_meeting[e.tag] = h.unescape(e.text)
       meeting = Meeting(originalId=int(raw_meeting['silfdnr']))
       meeting.start = self.parse_date(raw_meeting['sisbvcs'])
       meeting.end = self.parse_date(raw_meeting['sisevcs'])
@@ -408,7 +410,7 @@ class ScraperAllRis(object):
     # head area
     head = {}
     for item in root[1].iterchildren():
-      head[item.tag] = item.text
+      head[item.tag] = h.unescape(item.text)
     if 'sitext' in head:
       meeting.name = head['sitext']
     if 'raname' in head:
@@ -459,7 +461,8 @@ class ScraperAllRis(object):
           else:
             if add_item.text:
               add_agenda_item[add_item.tag] = h.unescape(add_item.text)
-        agendaitem.name = add_agenda_item['toptext']
+        if 'toptext' in add_agenda_item:
+          agendaitem.name = add_agenda_item['toptext']
         
         # there are papers with id = 0. we don't need them.
         if int(elem['volfdnr']):
@@ -713,8 +716,8 @@ class ScraperAllRis(object):
     ext = 'dat'
     
     try:
-      name = file.name
-    except AttributeError:
+      name = file.name[:192]
+    except (AttributeError, TypeError):
       name = file.originalId
     
     for extension in self.config['file_extensions']:
@@ -723,8 +726,6 @@ class ScraperAllRis(object):
         break
     if ext == 'dat':
       logging.warn("No entry in config:main:file_extensions for %s at file id %s", file.mimetype, file.originalId)
-    # Verhindere Dateinamen > 255 Zeichen
-    name = name[:192]
     return name + '.' + ext
 
   def get_url(self, url, post_data=None):

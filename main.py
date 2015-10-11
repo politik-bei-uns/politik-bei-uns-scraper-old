@@ -89,7 +89,7 @@ if __name__ == '__main__':
   logfile = 'scrapearis.log'
   if config['scraper']['log_base_dir'] is not None:
     now = datetime.datetime.utcnow()
-    logfile = '%s%s-%s.log' % (config['scraper']['log_base_dir'], config['city']['_id'], now.strftime('%Y%m%d-%H%M'))
+    logfile = '%s/%s-%s.log' % (config['scraper']['log_base_dir'], config['city']['_id'], now.strftime('%Y%m%d-%H%M'))
   levels = {
     'DEBUG': logging.DEBUG,
     'INFO': logging.INFO,

@@ -138,7 +138,10 @@ class ScraperAllRis(object):
     for node in tree[1].iterchildren():
       elem = {}
       for e in node.iterchildren():
-        elem[e.tag] = h.unescape(e.text)
+        if e.text:
+          elem[e.tag] = h.unescape(e.text)
+        else:
+          elem[e.tag] = ''
       
       # now retrieve person details such as organization memberships etc.
       # we also get the age (but only that, no date of birth)

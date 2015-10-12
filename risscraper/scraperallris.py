@@ -224,7 +224,10 @@ class ScraperAllRis(object):
     for item in root.iterchildren():
       raw_meeting = {}
       for e in item.iterchildren():
-        raw_meeting[e.tag] = h.unescape(e.text)
+        if e.text:
+          raw_meeting[e.tag] = h.unescape(e.text)
+        else:
+          raw_meeting[e.tag] = ''
       meeting = Meeting(originalId=int(raw_meeting['silfdnr']))
       meeting.start = self.parse_date(raw_meeting['sisbvcs'])
       meeting.end = self.parse_date(raw_meeting['sisevcs'])

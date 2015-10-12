@@ -416,7 +416,10 @@ class ScraperAllRis(object):
     # head area
     head = {}
     for item in root[1].iterchildren():
-      head[item.tag] = h.unescape(item.text)
+      if item.text:
+        head[item.tag] = h.unescape(item.text)
+      else:
+        head[item.text] = ''
     if 'sitext' in head:
       meeting.name = head['sitext']
     if 'raname' in head:

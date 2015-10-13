@@ -670,12 +670,13 @@ class ScraperAllRis(object):
                 link = tr[0][0]
                 href = "%s%s" % (self.config['scraper']['base_url'], link.attrib["href"])
                 name = link.text
-                originalId = str(int(link.attrib["href"].split('/')[4]))
+                originalId = str(int(link.attrib["href"].split('/')[4])) + '-' + str(int(link.attrib["href"].split('/')[6]))
                 file = File(
                   originalId=originalId,
                   name=name)
                 file = self.get_file(file, href)
                 paper.auxiliaryFile.append(file)
+        print paper.auxiliaryFile
         if not len(paper.auxiliaryFile):
           del paper.auxiliaryFile
         oid = self.db.save_paper(paper)

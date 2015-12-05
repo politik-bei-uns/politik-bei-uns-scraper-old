@@ -84,10 +84,10 @@ class MongoDatabase(object):
     Delete all data from database.
     """
     self.db.queue.remove({})
-    self.db.agendaitem.remove({})
+    self.db.agendaItem.remove({})
     self.db.consultation.remove({})
     self.db.file.remove({})
-    self.db.legislativeterm.remove({})
+    self.db.legislativeTerm.remove({})
     self.db.location.remove({})
     self.db.meeting.remove({})
     self.db.membership.remove({})
@@ -149,8 +149,8 @@ class MongoDatabase(object):
       return True
     return False
 
-  def agendaitem_exists(self, id):
-    if self.get_object_id('agendaitem', 'externalId', id) is not None:
+  def agendaItem_exists(self, id):
+    if self.get_object_id('agendaItem', 'externalId', id) is not None:
       return True
     return False
   
@@ -315,7 +315,7 @@ class MongoDatabase(object):
     """
     Write agendaitem object to database. This means dereferencing all associated objects as DBrefs
     """
-    agendaitem_stored = self.get_object('agendaitem', 'originalId', agendaitem.originalId)
+    agendaitem_stored = self.get_object('agendaItem', 'originalId', agendaitem.originalId)
     agendaitem_dict = agendaitem.dict()
 
     # setting body
@@ -327,7 +327,7 @@ class MongoDatabase(object):
     # dereference items
     agendaitem_dict = self.dereference_object(agendaitem_dict, 'consultation')
 
-    return self.save_object(agendaitem_dict, agendaitem_stored, 'agendaitem')
+    return self.save_object(agendaitem_dict, agendaitem_stored, 'agendaItem')
   
   def save_consultation(self, consultation):
     """

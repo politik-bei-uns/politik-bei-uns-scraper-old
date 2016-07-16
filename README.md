@@ -1,35 +1,20 @@
-# scrape-a-ris
+# Scraper für Politik bei Uns
 
-### English summary
+Die Scraper können aus den Ratsinformationssysteme (RIS) Somacos, SessionNet und CC e-gov AllRis strukturierte Daten wie Personen, Gruppierungen, Sitzungen, Tagesordnungspunkten, Beschlussvorlagen, Anträgen und Anhängen auslesen und diese in einer Datenbank ablegen.
 
-ris-scraper is a scraper for assembly information systems (Ratsinformationssysteme, RIS)
-using Somacos SessionNet or CC e-gov AllRis, written in Python.
-
-
-## Was ist ris-scraper?
-
-ris-scraper ist ein Scraper für Ratsinformationssysteme (RIS). Bislang werden die Systeme Somacos SessionNet und CC e-gov AllRis unterstützt.
-
-ris-scraper kann verwendet werden, um die strukturierten Daten und Inhalte aus Personen, Gruppierungen, Sitzungen, Tagesordnungspunkten,
-Beschlussvorlagen, Anträgen und Anhängen auszulesen und diese in einer Datenbank abzulegen. Das Wort [Scraper](http://de.wikipedia.org/wiki/Screen_Scraping)
-deutet auf die Funktionsweise hin: die Inhalte werden so aus den HTML-Seiten des RIS gelesen, wie sie für ganz
-normale Besucher im Web angezeigt werden.
-
-ris-scraper ist die Grundlage für die Web-Plattform "Politik bei uns" ([Github](https://github.com/okfde/ris-web)), 
-[WWW](https://politik-bei-uns.de/), die zur benutzerfreundlichen Suche und Anzeige der Daten genutzt werden kann.
-ris-scraper kann jedoch auch unabhängig davon eingesetzt werden, bietet aber kein eigenes User Interface.
-Zudem muss beachtet werden, dass die bearbeitenden Scripte sowie das OParl Interface ebenfalls in ([ris-web](https://github.com/okfde/ris-web) enthalten sind.
-
+Diese Scraper sind die Grundlage für die Website Politik bei uns ([Github](https://github.com/okfde/politik-bei-uns-scraper-web), 
+[WWW](https://politik-bei-uns.de/)), die zur benutzerfreundlichen Suche und Anzeige der Daten genutzt werden kann.
+Sie können jedoch auch unabhängig davon eingesetzt werden.
 
 ## Anforderungen
 
-ris-scraper ist in Python geschrieben und wurde erfolgreich mit Python-Version 2.7 auf Debian und Ubuntu getestet.
+Die Scraper sind in Python 2 geschrieben und speichern die Daten in einer [MongoDB](http://www.mongodb.org/) Datenbank.
 
-Daten werden in einer [MongoDB](http://www.mongodb.org/) Datenbank gespeichert. Empfohlen ist die aktuellste Version 2.6.
-
-Weitere benötigte Software wird in der [Installationsanleitung](https://github.com/okfde/ris-scraper/wiki/Installation) genannt.
+Weitere benötigte Software wird in der [Installationsanleitung](https://github.com/okfde/politik-bei-uns-scraper/wiki/Installation) genannt.
 
 ## Installation
+
+Eine [ausführliche Installationsanleitung](https://github.com/okfde/politik-bei-uns-scraper/wiki/Installation) findet sich im Wiki.
 
 Synopsis:
 
@@ -38,7 +23,6 @@ Synopsis:
 3. MongoDB starten
 4. Konfigurationsdatei config_example.py kopieren zu config.py, config.py anpassen
 
-Eine [ausführliche Installationsanleitung](https://github.com/okfde/ris-scraper/wiki/Installation) findet sich im Wiki.
 
 ## Anwendung
 
@@ -50,19 +34,11 @@ Mit diesem Aufruf können Inhalte für Februar und März 2013 abgerufen werden:
 
     >>> python main.py --start 2013-02 --end 2013-03
 
-Viel mehr zur Benutzung gibt es in einem [ausführlichen Tutorial](https://github.com/okfde/ris-scraper/wiki/Benutzung).
+Viel mehr zur Benutzung gibt es in einem [ausführlichen Tutorial](https://github.com/okfde/politik-bei-uns-scraper/wiki/Benutzung).
 
-###Lizenz
+### Lizenz
 
-Der Code steht unter der BSD 3-Clause License [Lizenz](https://github.com/okfde/ris-scraper/blob/master/LIZENZ.txt).
-
-## Feedback
-
-Bitte nutze den [Issues](https://github.com/okfde/ris-scraper/issues) Bereich in diesem Github repository, um
-Bugs zu melden.
-
-Wenn Du Hilfe bei der Anpassung der Konfiguration an Dein RIS benötigst, kannst Du Dich auch an die [RIS-Öffner
-Mailngliste](https://groups.google.com/group/ris-oeffner/) wenden.
+Der Code steht unter der BSD 3-Clause License [Lizenz](https://github.com/okfde/politik-bei-uns-scraper/blob/master/LIZENZ.txt).
 
 ## Geschichte
 
